@@ -84,6 +84,10 @@ See function:
 If the information of the position of the line in the previous frame is not available, I just use the current estimation
 One last note: if the estimated current position is outside the slope boundaries I mentioned above, I either ignore the current frame and do not provide the position of the lane line, or - if I have the information of the line position for the previous frame - I assume the lane line to be in the same position
 
+###### Please check the test folders for the final results
+
+<img src="final_result_video.gif" width="480" alt="Grayscale Image" />
+
 
 ### 2. Identify potential shortcomings with your current pipeline
 
