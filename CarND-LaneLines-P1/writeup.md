@@ -42,6 +42,23 @@ The first step was to tune the hyperparamters for the Hough transform in order t
 Together with a bit of reasoning (assumption on the lenght of lane-lines, width, etc...), the approach has been mainly a trial and error.
 I used the test images to test whether my tuning was good enough and if the detected lines were (mostly) just the real lane lines. 
 
+#### Find 2 lane lines - First solution
+The goal of the project is to find the 2 lane lines at the left and right of the camera.
+At first I tried to avarage value the slope and intercept of all the lines with negative slope and positive slope respectively.
+This worked well enough for the test images, but not as well for videos.
+The result was pretty noisy and the output would result in lane lines moving around the video stream all the time, or at best, to be very shaky.
+
+
+#### Find 2 lane lines - Second solution: Discard certain lines
+It is appeared obvious that useful lane lines would not be horizontal, and more in general their slope would be confined to specific values.
+In order to improve the output of the video lane lines detection, the avarage slope and intercept was calculated only by taking those lines whose slope is between certain limits.
+This has shown huge improvements in the outcome
+
+#### Find 2 lane lines - Third solution: Linear regression instead of avarage
+This step is a minor improvement over the previous one. In order to find one line for the negative and positive lane lines, instead of avaraging, I find the best fir by computing a linear regression over the cluster of points defined by the Hough Transform.
+See function:
+        find_pos_and_neg_lines
+        get_line_coeff
     
 
 ![alt text][image1]
