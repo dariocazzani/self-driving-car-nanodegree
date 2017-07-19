@@ -57,9 +57,19 @@ This has shown huge improvements in the outcome
 #### Find 2 lane lines - Third solution: Linear regression instead of avarage
 This step is a minor improvement over the previous one. In order to find one line for the negative and positive lane lines, instead of avaraging, I find the best fir by computing a linear regression over the cluster of points defined by the Hough Transform.
 See function:
-        find_pos_and_neg_lines
-        get_line_coeff
+##### - find_pos_and_neg_lines
+##### - get_line_coeff
     
+#### Find 2 lane lines - Final Solution: Use info from previous frame
+Because results were good on the test images, but the results were alwasy "shaky" on videos, I decided to see if was possible to improve the estimation of the line position given the information on the lines at the previous frame.
+This is justified by the assumption that lane lines don't "move" around too much between each frame.
+Whenever the information for the previous line is available, the current position is calculated by smoothing the estimation with a first order IIR filter.
+position(t_1) = alpha * position_previous_frame + beta * current_position 
+See function:
+##### get_line_coeff
+If the information of the position of the line in the previous frame is not available, I just use the current estimation
+One last note: if the estimated current position is outside the slope boundaries I mentioned above, I either ignore the current frame and do not provide the position of the lane line, or - if I have the information of the line position for the previous frame - I assume the lane line to be in the same position
+
 
 ![alt text][image1]
 
