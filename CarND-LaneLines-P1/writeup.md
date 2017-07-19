@@ -42,6 +42,11 @@ The goals / steps of this project are the following:
 
 ### * Detect lines: 
     Using the Hough transform it is possible to associate a line to a cluster of points in the image
+    
+<img src="writeup_images/dashed_lines_only.jpg" width="480" alt="Grayscale Image" />
+
+### Final result
+<img src="writeup_images/final_dashed.jpg" width="480" alt="Grayscale Image" />
 
 ## Details behind how lines were detected
 
