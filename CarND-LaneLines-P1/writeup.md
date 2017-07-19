@@ -23,15 +23,22 @@ The goals / steps of this project are the following:
 
 ### * Convert image to grayscale
     Colors are not important (I believe for now) in order to detect lane lines
-    ![alt text][gray]
+    
+<img src="writeup_images/gray.jpg" width="480" alt="Grayscale Image" />
     
 ### * Apply Gaussian Blur: 
     The next step includes blurring for reducing noise in edge detection, but an extra step allows us to have better control over the outcome
+
+<img src="writeup_images/blur.jpg" width="480" alt="Grayscale Image" />
     
 ### * Edge detection using Canny algorithm
 
+<img src="writeup_images/canny.jpg" width="480" alt="Grayscale Image" />
+
 ### * Masking:
     Not all image is useful for detecting lane lines as they appear to a specific area of the camera view.
+
+<img src="writeup_images/masked.jpg" width="480" alt="Grayscale Image" />
 
 ### * Detect lines: 
     Using the Hough transform it is possible to associate a line to a cluster of points in the image
