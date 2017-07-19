@@ -25,7 +25,7 @@ The goals / steps of this project are the following:
     Colors are not important (I believe for now) in order to detect lane lines
     
 #### * Apply Gaussian Blur: 
-    Step number 3 includes blurring for reducing noise in edge detection, but an extra step allows us to have better control over the outcome
+    The next step includes blurring for reducing noise in edge detection, but an extra step allows us to have better control over the outcome
     
 #### * Edge detection using Canny algorithm
 
@@ -36,6 +36,11 @@ The goals / steps of this project are the following:
     Using the Hough transform it is possible to associate a line to a cluster of points in the image
 
 ### Details behind how lines were detected
+
+#### Tune the Hough Transform hyperparameters
+The first step was to tune the hyperparamters for the Hough transform in order to extract only lane lines.
+Together with a bit of reasoning (assumption on the lenght of lane-lines, width, etc...), the approach has been mainly a trial and error.
+I used the test images to test whether my tuning was good enough and if the detected lines were (mostly) just the real lane lines. 
 
     
 
