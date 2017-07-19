@@ -11,7 +11,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/grayscale.jpg "Grayscale"
+[gray]: writeup_images/gray.jpg "Grayscale"
 
 ---
 
@@ -23,6 +23,7 @@ The goals / steps of this project are the following:
 
 ### * Convert image to grayscale
     Colors are not important (I believe for now) in order to detect lane lines
+    ![alt text][gray]
     
 ### * Apply Gaussian Blur: 
     The next step includes blurring for reducing noise in edge detection, but an extra step allows us to have better control over the outcome
