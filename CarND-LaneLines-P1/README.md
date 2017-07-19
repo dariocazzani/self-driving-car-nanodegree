@@ -1,4 +1,4 @@
-# **Finding Lane Lines on the Road**
+# **Finding Lane Lines on the Road** 
 
 ---
 
@@ -19,18 +19,18 @@ The goals / steps of this project are the following:
 
 ## 1. Pipeline Description:
 
-    My pipeline consisted of 5 steps.
+    My pipeline consisted of 5 steps. 
 
 ### * Convert image to grayscale
     Colors are not important (I believe for now) in order to detect lane lines
-
+    
 <img src="writeup_images/gray.jpg" width="480" alt="Grayscale Image" />
-
-### * Apply Gaussian Blur:
+    
+### * Apply Gaussian Blur: 
     The next step includes blurring for reducing noise in edge detection, but an extra step allows us to have better control over the outcome
 
 <img src="writeup_images/blur.jpg" width="480" alt="Grayscale Image" />
-
+    
 ### * Edge detection using Canny algorithm
 
 <img src="writeup_images/canny.jpg" width="480" alt="Grayscale Image" />
@@ -40,9 +40,9 @@ The goals / steps of this project are the following:
 
 <img src="writeup_images/masked.jpg" width="480" alt="Grayscale Image" />
 
-### * Detect lines:
+### * Detect lines: 
     Using the Hough transform it is possible to associate a line to a cluster of points in the image
-
+    
 <img src="writeup_images/dashed_lines_only.jpg" width="480" alt="Grayscale Image" />
 
 ### Final result
@@ -53,9 +53,9 @@ The goals / steps of this project are the following:
 ### Tune the Hough Transform hyperparameters
 The first step was to tune the hyperparamters for the Hough transform in order to extract only lane lines.
 Together with a bit of reasoning (assumption on the lenght of lane-lines, width, etc...), the approach has been mainly a trial and error.
-I used the test images to test whether my tuning was good enough and if the detected lines were (mostly) just the real lane lines.
+I used the test images to test whether my tuning was good enough and if the detected lines were (mostly) just the real lane lines. 
 
-### Find 2 lane lines
+### Find 2 lane lines 
 
 #### First solution
 The goal of the project is to find the 2 lane lines at the left and right of the camera.
@@ -73,16 +73,20 @@ This step is a minor improvement over the previous one. In order to find one lin
 See function:
 ##### - find_pos_and_neg_lines
 ##### - get_line_coeff
-
+    
 #### Final Solution: Use info from previous frame
 Because results were good on the test images, but were alwasy "shaky" on videos, I decided to see if was possible to improve the estimation of the line position given the information of the lines at the previous frame.
 This is justified by the assumption that lane lines don't "move" around too much between each frame.
 Whenever the information for the previous line is available, the current position is calculated by smoothing the estimation with a first order IIR filter.
-position(t_1) = alpha * position_previous_frame + beta * current_position
+position(t_1) = alpha * position_previous_frame + beta * current_position 
 See function:
 ##### get_line_coeff
 If the information of the position of the line in the previous frame is not available, I just use the current estimation
 One last note: if the estimated current position is outside the slope boundaries I mentioned above, I either ignore the current frame and do not provide the position of the lane line, or - if I have the information of the line position for the previous frame - I assume the lane line to be in the same position
+
+###### Please check the test folders for the final results
+
+<img src="final_result_video.gif" width="480" alt="Grayscale Image" />
 
 
 ### 2. Identify potential shortcomings with your current pipeline
