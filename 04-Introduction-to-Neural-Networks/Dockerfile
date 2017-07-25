@@ -41,6 +41,7 @@ RUN apt-get update
 
 RUN pip install Pillow
 RUN pip install pandas
+RUN pip install ipython
 WORKDIR /root
 
 CMD ["bash"]
