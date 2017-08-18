@@ -5,3 +5,4 @@ test_videos
 *DS_Store
 *zip
 *html
+__pycache__
