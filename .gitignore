@@ -3,3 +3,5 @@ test_videos
 *.ipynb_checkpoints
 # test*
 *DS_Store
+*zip
+*html
