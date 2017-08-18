@@ -11,5 +11,3 @@ Before you start the lab, you should first install:
 * SciPy
 * matplotlib
 
-## Download code and data
-        ./download_data_and_code.sh
