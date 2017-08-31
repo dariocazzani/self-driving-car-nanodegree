@@ -6,3 +6,7 @@ test_videos
 *zip
 *html
 __pycache__
+Data
+data_example
+mac_sim*
+model.h5
