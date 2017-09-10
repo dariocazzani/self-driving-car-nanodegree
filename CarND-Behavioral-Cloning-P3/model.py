@@ -1,6 +1,5 @@
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Lambda, Cropping2D
-from keras.layers.advanced_activations import ELU
 from keras.regularizers import l2, activity_l2
 from keras.optimizers import Adam
 from keras.layers import Convolution2D
@@ -67,12 +66,9 @@ if __name__ == '__main__':
     model.add(Convolution2D(64, 3, 3, activation='relu'))
     model.add(Convolution2D(64, 3, 3, activation='relu'))
     model.add(Flatten())
-    model.add(Dense(100, W_regularizer=l2(0.001)))
-    model.add(ELU())
-    model.add(Dense(50, W_regularizer=l2(0.001)))
-    model.add(ELU())
-    model.add(Dense(10, W_regularizer=l2(0.001)))
-    model.add(ELU())
+    model.add(Dense(100, W_regularizer=l2(0.001), activation='relu'))
+    model.add(Dense(50, W_regularizer=l2(0.001), activation='relu'))
+    model.add(Dense(10, W_regularizer=l2(0.001), activation='relu'))
 
     # Add a fully connected output layer
     model.add(Dense(1))
