@@ -13,6 +13,8 @@ import random
 import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
+
+    # Read file with path to images and values of steering angles
     samples = []
     source = 'Data'
     with open('{}/driving_log.csv'.format(source)) as csvfile:
@@ -24,6 +26,8 @@ if __name__ == '__main__':
     train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 
+    # Instead of loading all data into memory, use a generator to read input images
+    # and steering angles at runtime.
     def generator(samples, batch_size=32):
         num_samples = len(samples)
         while 1: # Loop forever so the generator never terminates
@@ -45,27 +49,28 @@ if __name__ == '__main__':
                         images.append(cv2.flip(rgb_image, 1))
                         angles.append((-1) * center_angle)
 
-                # trim image to only see section with road
                 X_train = np.array(images)
                 y_train = np.array(angles)
                 yield sklearn.utils.shuffle(X_train, y_train)
 
-    # compile and train the model using the generator function
+    # Compile and train the model using the generator function
     train_generator = generator(train_samples, batch_size=32)
     validation_generator = generator(validation_samples, batch_size=32)
-    print(train_generator.__next__()[0].shape)
-
-    ch, row, col = 3, 80, 320  # Trimmed image format
 
     model = Sequential()
+    # Normalize
     model.add(Lambda(lambda x: x / 255. -0.5, input_shape=(160, 320, 3)))
+    # trim image to only see section with road
     model.add(Cropping2D(cropping=((70, 25), (0,0))))
+    # Convolutional Layers
     model.add(Convolution2D(24, 5, 5, subsample=(2, 2), activation='relu'))
     model.add(Convolution2D(36, 5, 5, subsample=(2, 2), activation='relu'))
     model.add(Convolution2D(48, 5, 5, subsample=(2, 2), activation='relu'))
     model.add(Convolution2D(64, 3, 3, activation='relu'))
     model.add(Convolution2D(64, 3, 3, activation='relu'))
+    # Flat the output of the convolutional layers
     model.add(Flatten())
+    # Fully connected layers with L2 norm regularization
     model.add(Dense(100, W_regularizer=l2(0.001), activation='relu'))
     model.add(Dense(50, W_regularizer=l2(0.001), activation='relu'))
     model.add(Dense(10, W_regularizer=l2(0.001), activation='relu'))
@@ -93,7 +98,7 @@ if __name__ == '__main__':
     plt.legend(['training set', 'validation set'], loc='upper right')
     plt.show()
 
-    # Bug fix: Keras cant delete session
+    # Bug fix: Keras can't delete session - on my machine at least
     import gc; gc.collect()
 
     model.save('model.h5')
