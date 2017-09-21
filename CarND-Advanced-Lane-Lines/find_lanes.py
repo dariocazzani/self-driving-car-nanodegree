@@ -15,13 +15,9 @@ def get_binary_birdeye(img):
     warped_binary_image = cv2.warpPerspective(binary_image, M, img_size, flags=cv2.INTER_LINEAR)
     return warped_binary_image
 
-if __name__ == '__main__':
-    test_image = 5
-    input_image = cv2.imread('test_images/test{}.jpg'.format(test_image))
-    binary_warped = get_binary_birdeye(input_image)
-
+def get_lanes_full_search(binary_warped):
     # Take a histogram of the bottom half of the image binary birdeye image
-    # NB: binary_warped is a 3 channel image - different from tutorial
+    # NB: binary_warped is a 3 channel image
     histogram = np.sum(binary_warped[int(binary_warped.shape[0]/2):, :, 0], axis=0)
     # Create an output image to draw on and visualize the result
     out_img = binary_warped.copy()
@@ -30,7 +26,6 @@ if __name__ == '__main__':
     midpoint = np.int(histogram.shape[0]/2)
     leftx_base = np.argmax(histogram[:midpoint])
     rightx_base = np.argmax(histogram[midpoint:]) + midpoint
-    print('midpoint: {} - leftx_base: {} - rightx_base: {}'.format(midpoint, leftx_base, rightx_base))
     # Choose the number of sliding windows
     nwindows = 9
     # Set height of windows
@@ -90,26 +85,57 @@ if __name__ == '__main__':
     left_fit = np.polyfit(lefty, leftx, 2)
     right_fit = np.polyfit(righty, rightx, 2)
 
-    # Generate x and y values for plotting
-    ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
-    left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
-    right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
-
     out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
     out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
 
-    # Draw curve on figure
-    left_lane_dots = zip(list(ploty), list(left_fitx))
-    right_lane_dots = zip(list(ploty), list(right_fitx))
-    for l in list(left_lane_dots):
-        cv2.circle(out_img, (int(l[1]), int(l[0])), 2, (0, 255, 255))
-    for r in list(right_lane_dots):
-        cv2.circle(out_img, (int(r[1]), int(r[0])), 2, (0, 255, 255))
+    return left_fit, right_fit, out_img
 
-    cv2.imwrite('test.png', out_img)
+def get_lanes_from_previous(binary_warped, left_fit, right_fit):
+    # Assume you now have a new warped binary image
+    # from the next frame of video (also called "binary_warped")
+    # It's now much easier to find line pixels!
+    nonzero = binary_warped.nonzero()
+    nonzeroy = np.array(nonzero[0])
+    nonzerox = np.array(nonzero[1])
+    margin = 100
+    left_lane_inds = ((nonzerox > (left_fit[0]*(nonzeroy**2) + left_fit[1]*nonzeroy +
+    left_fit[2] - margin)) & (nonzerox < (left_fit[0]*(nonzeroy**2) +
+    left_fit[1]*nonzeroy + left_fit[2] + margin)))
 
-    # num_test_images = 6
-    # for test_image in range(1, num_test_images+1):
-    #     input_image = cv2.imread('test_images/test{}.jpg'.format(test_image))
-    #     warped_binary_image = get_binary_birdeye(input_image)
-    #     cv2.imwrite('output_images/test{}_binary_birdeye.png'.format(test_image), warped_binary_image)
+    right_lane_inds = ((nonzerox > (right_fit[0]*(nonzeroy**2) + right_fit[1]*nonzeroy +
+    right_fit[2] - margin)) & (nonzerox < (right_fit[0]*(nonzeroy**2) +
+    right_fit[1]*nonzeroy + right_fit[2] + margin)))
+
+    # Again, extract left and right line pixel positions
+    leftx = nonzerox[left_lane_inds]
+    lefty = nonzeroy[left_lane_inds]
+    rightx = nonzerox[right_lane_inds]
+    righty = nonzeroy[right_lane_inds]
+    # Fit a second order polynomial to each
+    left_fit = np.polyfit(lefty, leftx, 2)
+    right_fit = np.polyfit(righty, rightx, 2)
+
+    return left_fit, right_fit
+
+if __name__ == '__main__':
+    num_test_images = 6
+    for test_image in range(1, num_test_images+1):
+        input_image = cv2.imread('test_images/test{}.jpg'.format(test_image))
+        binary_warped = get_binary_birdeye(input_image)
+        left_fit, right_fit, out_img = get_lanes_full_search(binary_warped)
+        left_fit, right_fit = get_lanes_from_previous(binary_warped, left_fit, right_fit)
+
+        # Generate x and y values for plotting
+        ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
+        left_fitx = left_fit[0]*ploty**2 + left_fit[1]*ploty + left_fit[2]
+        right_fitx = right_fit[0]*ploty**2 + right_fit[1]*ploty + right_fit[2]
+
+        # Draw curve on figure
+        left_lane_dots = zip(list(ploty), list(left_fitx))
+        right_lane_dots = zip(list(ploty), list(right_fitx))
+        for l in list(left_lane_dots):
+            cv2.circle(out_img, (int(l[1]), int(l[0])), 2, (0, 255, 255))
+        for r in list(right_lane_dots):
+            cv2.circle(out_img, (int(r[1]), int(r[0])), 2, (0, 255, 255))
+
+        cv2.imwrite('output_images/test{}_with_lanes.jpg'.format(test_image), out_img)

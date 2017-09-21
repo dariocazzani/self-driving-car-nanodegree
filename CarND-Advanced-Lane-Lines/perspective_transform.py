@@ -18,7 +18,7 @@ def get_matrix_transform(perform_test=False):
     # Convert to grayscale
     # img_gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
     # source points are found empirically
-    src = np.float32([[575, 465], [280, 670], [1025, 670], [710, 465]])
+    src = np.float32([[575, 465], [230, 705], [1075, 705], [710, 465]])
     # destination points are found empirically
     dst = np.float32([[320, 0], [320, 720], [960, 720], [960, 0]])
     # cv2.line(img, pt1, pt2)
