@@ -18,12 +18,13 @@ def get_matrix_transform(perform_test=False):
     # Convert to grayscale
     # img_gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
     # source points are found empirically
-    src = np.float32([[575, 465], [230, 705], [1075, 705], [710, 465]])
+    src = np.float32([[600, 450], [230, 705], [1075, 705], [685, 450]])
     # destination points are found empirically
     dst = np.float32([[320, 0], [320, 720], [960, 720], [960, 0]])
     # cv2.line(img, pt1, pt2)
-    print('Calculating transform matrix...')
+    print('Calculating transform matrix and its inverse...')
     matrix_transform = cv2.getPerspectiveTransform(src, dst)
+    inv_matrix_transform = cv2.getPerspectiveTransform(dst, src)
     # Warp the image using OpenCV warpPerspective()
     warped = undistorted_image.copy()
     if perform_test:
@@ -35,7 +36,7 @@ def get_matrix_transform(perform_test=False):
         cv2.imwrite('output_images/straight_lines1_birdeye.png', warped)
 
     # Return the resulting image and matrix
-    return warped, matrix_transform
+    return warped, matrix_transform, inv_matrix_transform
 
 if __name__ == '__main__':
-    warped, matrix_transform = get_matrix_transform(perform_test=True)
+    warped, matrix_transform, _ = get_matrix_transform(perform_test=True)

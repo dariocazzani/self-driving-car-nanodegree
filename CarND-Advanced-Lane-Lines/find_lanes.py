@@ -8,9 +8,9 @@ def get_binary_birdeye(img):
     # Get camera matrix and distortion coefficients
     objpoints, imgpoints = get_calib_points()
     ret, mtx, dist, rvecs, tvecs = get_coefficients(objpoints, imgpoints, (720, 1280))
-    undistorted_image = undistort_image(input_image, mtx, dist)
+    undistorted_image = undistort_image(img, mtx, dist)
     binary_image, _ = get_binary_img(undistorted_image)
-    _, M = get_matrix_transform()
+    _, M, _ = get_matrix_transform()
     img_size = (binary_image.shape[1], binary_image.shape[0])
     warped_binary_image = cv2.warpPerspective(binary_image, M, img_size, flags=cv2.INTER_LINEAR)
     return warped_binary_image
@@ -81,14 +81,10 @@ def get_lanes_full_search(binary_warped):
     rightx = nonzerox[right_lane_inds]
     righty = nonzeroy[right_lane_inds]
 
-    # Fit a second order polynomial to each
-    left_fit = np.polyfit(lefty, leftx, 2)
-    right_fit = np.polyfit(righty, rightx, 2)
-
     out_img[nonzeroy[left_lane_inds], nonzerox[left_lane_inds]] = [255, 0, 0]
     out_img[nonzeroy[right_lane_inds], nonzerox[right_lane_inds]] = [0, 0, 255]
 
-    return left_fit, right_fit, out_img
+    return lefty, leftx, righty, rightx, out_img
 
 def get_lanes_from_previous(binary_warped, left_fit, right_fit):
     # Assume you now have a new warped binary image
@@ -111,19 +107,26 @@ def get_lanes_from_previous(binary_warped, left_fit, right_fit):
     lefty = nonzeroy[left_lane_inds]
     rightx = nonzerox[right_lane_inds]
     righty = nonzeroy[right_lane_inds]
-    # Fit a second order polynomial to each
-    left_fit = np.polyfit(lefty, leftx, 2)
-    right_fit = np.polyfit(righty, rightx, 2)
 
-    return left_fit, right_fit
+    return lefty, leftx, righty, rightx
 
 if __name__ == '__main__':
     num_test_images = 6
     for test_image in range(1, num_test_images+1):
         input_image = cv2.imread('test_images/test{}.jpg'.format(test_image))
         binary_warped = get_binary_birdeye(input_image)
-        left_fit, right_fit, out_img = get_lanes_full_search(binary_warped)
-        left_fit, right_fit = get_lanes_from_previous(binary_warped, left_fit, right_fit)
+
+        # Full search
+        lefty, leftx, righty, rightx, out_img = get_lanes_full_search(binary_warped)
+        # Fit a second order polynomial to each
+        left_fit = np.polyfit(lefty, leftx, 2)
+        right_fit = np.polyfit(righty, rightx, 2)
+
+        # Use data from previous frame
+        lefty, leftx, righty, rightx = get_lanes_from_previous(binary_warped, left_fit, right_fit)
+        # Fit a second order polynomial to each
+        left_fit = np.polyfit(lefty, leftx, 2)
+        right_fit = np.polyfit(righty, rightx, 2)
 
         # Generate x and y values for plotting
         ploty = np.linspace(0, binary_warped.shape[0]-1, binary_warped.shape[0] )
