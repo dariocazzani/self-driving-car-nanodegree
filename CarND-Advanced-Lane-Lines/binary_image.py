@@ -40,6 +40,7 @@ def get_binary_img(img, s_thresh=(120, 255), sx_thresh=(20, 255),l_thresh=(40,25
 if __name__ == '__main__':
     num_test_images = 6
     for test_image in range(1, num_test_images+1):
+        print('processing image test_images/test{}.jpg'.format(test_image))
         image = cv2.imread('test_images/test{}.jpg'.format(test_image))
         combined_binary, color_binary = get_binary_img(image)
         cv2.imwrite('output_images/test{}_binary.png'.format(test_image), combined_binary)
