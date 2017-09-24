@@ -8,6 +8,7 @@ from find_lanes import get_lanes_full_search, get_lanes_from_previous
 from draw_lanes import draw_lane
 from curvature import get_curvatures_in_pixels, get_vehicle_offset_pixels
 import sys
+
 def progress(count, total, suffix=''):
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
@@ -88,9 +89,11 @@ if __name__ == '__main__':
         - Undistort frame
         - Get thresholded binary image for lane detection
         - Warp image to get birdeye view of the street
-        - Detect lanes
-        - Calculate radii and vehicle offset
+        - Detect lanes and smooth between frames
         - Fit a second order polynomial to each lane
+        - Calculate radii and vehicle offset
+        - Draw lanes and add text
+        - Save frame
 
     """
     print('Processing video...')
@@ -106,7 +109,7 @@ if __name__ == '__main__':
         img_size = (binary_frame.shape[1], binary_frame.shape[0])
         warped = cv2.warpPerspective(binary_frame, matrix_transform, img_size, flags=cv2.INTER_LINEAR)
 
-        # Detect lanes
+        # Detect lanes and smooth between frames
         if idx == 0:
             lefty, leftx, righty, rightx, _ = get_lanes_full_search(warped)
             # Fit a second order polynomial to each lane
