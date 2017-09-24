@@ -38,5 +38,23 @@ def get_matrix_transform(perform_test=False):
     # Return the resulting image and matrix
     return warped, matrix_transform, inv_matrix_transform
 
+from binary_image import get_binary_img
+def get_binary_birdeye(img):
+    # Get camera matrix and distortion coefficients
+    objpoints, imgpoints = get_calib_points()
+    ret, mtx, dist, rvecs, tvecs = get_coefficients(objpoints, imgpoints, (720, 1280))
+    undistorted_image = undistort_image(img, mtx, dist)
+    binary_image, _ = get_binary_img(undistorted_image)
+    _, M, _ = get_matrix_transform()
+    img_size = (binary_image.shape[1], binary_image.shape[0])
+    warped_binary_image = cv2.warpPerspective(binary_image, M, img_size, flags=cv2.INTER_LINEAR)
+    return warped_binary_image
+
 if __name__ == '__main__':
     warped, matrix_transform, _ = get_matrix_transform(perform_test=True)
+
+    num_test_images = 6
+    for test_image in range(1, num_test_images+1):
+        input_image = cv2.imread('test_images/test{}.jpg'.format(test_image))
+        binary_warped = get_binary_birdeye(input_image)
+        cv2.imwrite('output_images/test{}_binary_birdeye.png'.format(test_image), binary_warped)
