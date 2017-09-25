@@ -18,7 +18,7 @@ ret, mtx, dist, rvecs, tvecs = get_coefficients(objpoints, imgpoints, img_size)
 
 def draw_lane(warped, undist):
     lefty, leftx, righty, rightx, out_img = get_lanes_full_search(warped)
-    left_curverad, right_curverad, center_offset_meters = get_curvatures_and_offset(lefty, leftx, righty, rightx, warped)
+    left_curverad, right_curverad, center_offset_meters, _ = get_curvatures_and_offset(lefty, leftx, righty, rightx, warped)
     # Fit a second order polynomial to each
     left_fit = np.polyfit(lefty, leftx, 2)
     right_fit = np.polyfit(righty, rightx, 2)
@@ -46,8 +46,12 @@ def draw_lane(warped, undist):
     result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
     # Add info about radius and offset
     font = cv2.FONT_HERSHEY_SIMPLEX
-    text1 = 'left_curverad {:.2f} meters - right_curverad: {:.2f}'.format(left_curverad, right_curverad)
-    text2 = 'offset: {:.3f} meters'.format(center_offset_meters)
+    text1 = 'left_curverad {:5.2f} meters - right_curverad: {:5.2f}'.format(left_curverad, right_curverad)
+    if center_offset_meters < 0:
+        text2 = 'offset: {:2.3f} meters to the left'.format(abs(center_offset_meters))
+    else:
+        text2 = 'offset: {:2.3f} meters to the right'.format(abs(center_offset_meters))
+
     cv2.putText(result, text1, (50, 30), font, 1, (0,0,255), 1, cv2.LINE_AA)
     cv2.putText(result, text2, (50, 70), font, 1, (0,0,255), 1, cv2.LINE_AA)
     return result

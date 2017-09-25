@@ -6,7 +6,7 @@ import numpy as np
 from binary_image import get_binary_img
 from find_lanes import get_lanes_full_search, get_lanes_from_previous
 from draw_lanes import draw_lane
-from curvature import get_curvatures_in_pixels, get_vehicle_offset_pixels
+from curvature import get_curvatures_in_pixels, get_curvatures_and_offset
 import sys
 
 def progress(count, total, suffix=''):
@@ -47,8 +47,12 @@ def draw(warped, left_fit, right_fit, Minv, undist):
 def add_text(img, left_curverad, right_curverad, center_offset_meters):
     # Add info about radius and offset
     font = cv2.FONT_HERSHEY_SIMPLEX
-    text1 = 'left_curverad {:.2f} meters - right_curverad: {:.2f}'.format(left_curverad, right_curverad)
-    text2 = 'offset: {:.3f} meters'.format(center_offset_meters)
+    text1 = 'left_curverad {:5.2f} meters - right_curverad: {:5.2f}'.format(left_curverad, right_curverad)
+    if center_offset_meters < 0:
+        text2 = 'offset: {:2.3f} meters to the left'.format(abs(center_offset_meters))
+    else:
+        text2 = 'offset: {:2.3f} meters to the right'.format(abs(center_offset_meters))
+
     cv2.putText(img, text1, (50, 30), font, 1, (0,0,255), 1, cv2.LINE_AA)
     cv2.putText(img, text2, (50, 70), font, 1, (0,0,255), 1, cv2.LINE_AA)
 
@@ -115,13 +119,13 @@ if __name__ == '__main__':
             # Fit a second order polynomial to each lane
             left_fit = np.polyfit(lefty, leftx, 2)
             right_fit = np.polyfit(righty, rightx, 2)
-            center_offset_pixels = get_vehicle_offset_pixels(leftx, rightx, warped)
+            _, _, _, center_offset_pixels = get_curvatures_and_offset(lefty, leftx, righty, rightx, warped)
         else:
             lefty, leftx, righty, rightx = get_lanes_from_previous(warped, left_fit, right_fit)
             # Fit a second order polynomial to each lane
             next_left_fit = np.polyfit(lefty, leftx, 2)
             next_right_fit = np.polyfit(righty, rightx, 2)
-            next_center_offset_pixels = get_vehicle_offset_pixels(leftx, rightx, warped)
+            _, _, _, next_center_offset_pixels = get_curvatures_and_offset(lefty, leftx, righty, rightx, warped)
 
             # smooth detected lanes
             left_fit = alpha * left_fit + beta * next_left_fit
@@ -131,14 +135,14 @@ if __name__ == '__main__':
         curvatures = get_curvatures_in_pixels(left_fit, right_fit, warped)
         left_curverad_pixels, right_curverad_pixels = curvatures
 
+        # smooth center offset
+        if idx > 0:
+            center_offset_pixels = alpha * center_offset_pixels + beta * next_center_offset_pixels
+
         # Convert to meters
         center_offset_meters = xm_per_pix * center_offset_pixels
         left_curverad = left_curverad_pixels / pxl_to_meters_radius_ratio
         right_curverad = right_curverad_pixels / pxl_to_meters_radius_ratio
-
-        # smooth center offset
-        if idx > 0:
-            center_offset_pixels = alpha * center_offset_pixels + beta * next_center_offset_pixels
 
         # Draw_lanes
         result = draw(warped, left_fit, right_fit, inv_matrix_transform, undistorted_frame)
