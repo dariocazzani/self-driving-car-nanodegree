@@ -3,6 +3,13 @@ import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+"""
+If you want to continue to explore additional color channels,
+I have seen that the L channel from LUV with lower and upper thresholds around 225 & 255
+respectively works very well to pick out the white lines, even in the parts of the video
+with heavy shadows.You can also try out the b channel from Lab which does a great job with
+the yellow lines (you can play around with thresholds around 155 & 200).
+"""
 
 def get_binary_img(img, s_thresh=(120, 255), sx_thresh=(20, 255),l_thresh=(40,255)):
     img = np.copy(img)
