@@ -38,7 +38,7 @@ def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=False, featu
         return features, hog_image
     return features
 
-def convert_color(img, conv='RGB2YCrCb'):
+def convert_color(img, conv='RGB2LUV'):
     if conv == 'RGB2YCrCb':
         return cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
     if conv == 'BGR2YCrCb':
@@ -46,6 +46,8 @@ def convert_color(img, conv='RGB2YCrCb'):
     if conv == 'RGB2LUV':
         return cv2.cvtColor(img, cv2.COLOR_RGB2LUV)
     if conv == 'RGB2HLS':
+        return cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
+    if conv == 'RGB2GRAY':
         return cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
 
 def get_features(img_path, verbose=False):
@@ -60,16 +62,16 @@ def get_features(img_path, verbose=False):
     img = mpimg.imread(img_path)
     # if np.max(img) > 1:
     #     img = img.astype(np.float32)/255
-    hls = convert_color(img, conv='RGB2HLS')
+    luv = convert_color(img, conv='RGB2LUV')
 
-    ch1 = hls[:,:,0]
-    ch2 = hls[:,:,1]
-    ch3 = hls[:,:,2]
+    ch1 = luv[:,:,0]
+    ch2 = luv[:,:,1]
+    ch3 = luv[:,:,2]
     # Compute individual channel HOG features for the entire image
     hog1 = get_hog_features(ch1, orient, pix_per_cell, cell_per_block, feature_vec=False).ravel()
-    hog2 = get_hog_features(ch2, orient, pix_per_cell, cell_per_block, feature_vec=False).ravel()
-    hog3 = get_hog_features(ch3, orient, pix_per_cell, cell_per_block, feature_vec=False).ravel()
-    hog_features = np.hstack((hog1, hog1, hog1))
+    # hog2 = get_hog_features(ch2, orient, pix_per_cell, cell_per_block, feature_vec=False).ravel()
+    # hog3 = get_hog_features(ch3, orient, pix_per_cell, cell_per_block, feature_vec=False).ravel()
+    hog_features = hog1#np.hstack((hog1, hog1, hog1))
 
     # Get color features
     spatial_features = bin_spatial(img, size=spatial_size)

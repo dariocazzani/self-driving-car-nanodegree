@@ -17,15 +17,11 @@ if __name__ == '__main__':
     scaled_X_test = X_scaler.transform(X_test)
 
     # hyperparameters
-    # parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4], 'C': [1, 10, 100, 1000]},
-    #               {'kernel': ['linear'], 'C': [1, 10, 100, 1000]}]
-    #
-    # parameters = [{'kernel': ['rbf'], 'gamma': [1e-3], 'C': [1]}]
-    parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10]}
+    # parameters = {'kernel':['rbf'], 'C':[1, 10]}
 
     # Random search of hyperparameters
     print('(Optional - Performing hyperparameters search and) Training classifier')
-    # svr = svm.SVC()
+    # svr = svm.SVC(verbose=3)
     clf = svm.SVC()
     # clf = GridSearchCV(svr, parameters)
     clf.fit(scaled_X_train, y_train)
@@ -45,7 +41,3 @@ if __name__ == '__main__':
         pickle.dump(clf, fid)
     with open('scaler.pkl', 'wb') as fid:
         pickle.dump(X_scaler, fid)
-
-    # # load it again
-    # with open('clf.pkl', 'rb') as fid:
-    #     clf = cPickle.load(fid)
